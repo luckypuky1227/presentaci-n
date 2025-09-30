@@ -1,0 +1,137 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentación sobre el Cambio Climático</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 2em;
+        }
+        nav {
+            background-color: #333;
+            padding: 1em;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 0 1em;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #4CAF50;
+        }
+        section {
+            padding: 2em;
+            margin: 2em auto;
+            max-width: 800px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1em auto;
+            border-radius: 8px;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1em;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>El Cambio Climático: Un Desafío Global</h1>
+    </header>
+    <nav>
+        <a href="#historia">Historia</a>
+        <a href="#impactos">Impactos</a>
+        <a href="#soluciones">Soluciones</a>
+    </nav>
+    <section id="historia">
+        <h2>Historia del Cambio Climático</h2>
+        <p>El cambio climático ha sido un tema de preocupación desde finales del siglo XX, cuando los científicos comenzaron a observar un aumento en las temperaturas globales debido a las emisiones de gases de efecto invernadero.</p>
+        <img src="images/historia1.jpg" alt="Gráfico de temperaturas globales">
+        <p>En las últimas décadas, el calentamiento global ha acelerado la necesidad de acciones urgentes para mitigar sus efectos.</p>
+        <img src="images/historia2.jpg" alt="Conferencia climática internacional">
+    </section>
+    <section id="impactos">
+        <h2>Impactos del Cambio Climático</h2>
+        <p>El cambio climático afecta a los ecosistemas, las economías y las comunidades de todo el mundo. Desde el derretimiento de los glaciares hasta eventos climáticos extremos, los impactos son visibles.</p>
+        <img src="images/impactos1.jpg" alt="Glaciar derritiéndose">
+        <p>Las comunidades costeras enfrentan el aumento del nivel del mar, mientras que las regiones agrícolas sufren sequías prolongadas.</p>
+        <img src="images/impactos2.jpg" alt="Inundación en zona costera">
+    </section>
+    <section id="soluciones">
+        <h2>Soluciones al Cambio Climático</h2>
+        <p>La mitigación del cambio climático requiere acciones colectivas, como la transición a energías renovables, la reforestación y la reducción de emisiones.</p>
+        <img src="images/soluciones1.jpg" alt="Parque eólico">
+        <p>La educación y la cooperación internacional son clave para construir un futuro sostenible.</p>
+        <img src="images/soluciones2.jpg" alt="Campaña de reforestación">
+    </section>
+    <footer>
+        <p>&copy; 2025 Presentación sobre el Cambio Climático</p>
+    </footer>
+</body>
+</html>
